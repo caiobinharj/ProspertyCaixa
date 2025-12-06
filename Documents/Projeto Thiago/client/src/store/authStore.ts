@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import axios from 'axios'
+import axios from '../config/axios'
 
 interface User {
   id: string

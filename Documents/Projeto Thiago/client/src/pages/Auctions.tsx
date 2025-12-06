@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import axios from '../config/axios'
 import { Link } from 'react-router-dom'
 
 interface Auction {

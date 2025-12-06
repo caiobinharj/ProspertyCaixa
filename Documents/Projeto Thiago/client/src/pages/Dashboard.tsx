@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import axios from '../config/axios'
 import { useAuthStore } from '../store/authStore'
 
 export default function Dashboard() {
