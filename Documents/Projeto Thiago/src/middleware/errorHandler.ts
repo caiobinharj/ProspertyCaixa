@@ -2,8 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
 
 export interface AppError extends Error {
-  statusCode?: number;
-  isOperational?: boolean;
+  statusCode: number;
+  isOperational: boolean;
 }
 
 export const errorHandler = (

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { AppError } from '../middleware/errorHandler';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -62,8 +62,8 @@ export const register = async (
 
     // Generate token
     const jwtSecret = process.env.JWT_SECRET || 'default-secret';
-    const jwtOptions: SignOptions = { expiresIn: process.env.JWT_EXPIRES_IN || '7d' };
-    const token = jwt.sign({ userId: user.id }, jwtSecret, jwtOptions);
+    const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
+    const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn } as any);
 
     res.status(201).json({
       success: true,
@@ -109,8 +109,8 @@ export const login = async (
     }
 
     const jwtSecret = process.env.JWT_SECRET || 'default-secret';
-    const jwtOptions: SignOptions = { expiresIn: process.env.JWT_EXPIRES_IN || '7d' };
-    const token = jwt.sign({ userId: user.id }, jwtSecret, jwtOptions);
+    const expiresIn = process.env.JWT_EXPIRES_IN || '7d';
+    const token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn } as any);
 
     res.json({
       success: true,

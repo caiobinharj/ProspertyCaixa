@@ -26,7 +26,12 @@ export const simulateInvestment = async (
 ) => {
   try {
     const data = simulateSchema.parse(req.body);
-    const result = await propertyInvest.simulateInvestment(data.assetId, data);
+    // Ensure purchasePrice is defined
+    const scenario = {
+      ...data,
+      purchasePrice: data.purchasePrice || 0
+    };
+    const result = await propertyInvest.simulateInvestment(data.assetId, scenario);
 
     res.json({
       success: true,

@@ -27,15 +27,18 @@ export class ScoutAIService {
     const listings = [];
 
     // Aggregate from CAIXA assets
+    const whereClause: any = {
+      status: { in: ['ACTIVE_SALE', 'AUCTION_SCHEDULED'] }
+    };
+    
+    if (filters.city) whereClause.city = filters.city;
+    if (filters.state) whereClause.state = filters.state;
+    if (filters.propertyType) whereClause.propertyType = filters.propertyType as any;
+    if (filters.minPrice) whereClause.askingPrice = { ...whereClause.askingPrice, gte: filters.minPrice };
+    if (filters.maxPrice) whereClause.askingPrice = { ...whereClause.askingPrice, lte: filters.maxPrice };
+    
     const caixaAssets = await prisma.asset.findMany({
-      where: {
-        status: { in: ['ACTIVE_SALE', 'AUCTION_SCHEDULED'] },
-        ...(filters.city && { city: filters.city }),
-        ...(filters.state && { state: filters.state }),
-        ...(filters.propertyType && { propertyType: filters.propertyType }),
-        ...(filters.minPrice && { askingPrice: { gte: filters.minPrice } }),
-        ...(filters.maxPrice && { askingPrice: { lte: filters.maxPrice } })
-      },
+      where: whereClause,
       include: {
         media: { where: { isPrimary: true }, take: 1 },
         valuations: { orderBy: { generatedAt: 'desc' }, take: 1 }
