@@ -1,0 +1,71 @@
+╔══════════════════════════════════════════════════════════════╗
+║         🚀 PROSPERTY BRAZIL - GUIA RÁPIDO                   ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 COMO RODAR O SITE LOCALMENTE:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Instalar dependências:
+   npm install
+   cd client && npm install && cd ..
+
+2. Configurar banco PostgreSQL:
+   - Criar banco: createdb prosperty_brazil
+   - Ou via psql: CREATE DATABASE prosperty_brazil;
+
+3. Configurar .env:
+   cp .env.example .env
+   # Edite o .env com suas credenciais
+
+4. Rodar migrações:
+   npx prisma generate
+   npx prisma migrate dev
+
+5. Iniciar:
+   npm run dev
+
+6. Acessar:
+   → Frontend: http://localhost:5173
+   → Backend: http://localhost:3000
+
+
+📤 FAZER PUSH PARA GITHUB:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+git remote add origin https://github.com/caiobinharj/ProspertyCaixa.git
+git add .
+git commit -m "Initial commit: Prosperty Brazil platform"
+git branch -M main
+git push -u origin main
+
+
+⚠️  GITHUB PAGES - NÃO FUNCIONA PARA ESTE PROJETO:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+GitHub Pages só funciona para sites estáticos (HTML/CSS/JS puro).
+Este projeto precisa de:
+  ❌ Backend Node.js
+  ❌ Banco de dados PostgreSQL
+  ❌ API REST
+
+✅ OPÇÕES GRATUITAS PARA HOSPEDAGEM:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. RAILWAY (Backend + DB) + VERCEL (Frontend)
+   → Railway: https://railway.app
+   → Vercel: https://vercel.com
+   → Veja DEPLOY.md para instruções
+
+2. RENDER (Tudo junto)
+   → https://render.com
+   → Full-stack + PostgreSQL gratuito
+
+📚 DOCUMENTAÇÃO COMPLETA:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+- SETUP_LOCAL.md → Setup detalhado local
+- DEPLOY.md → Guia completo de deploy
+- README.md → Documentação técnica
+- COMANDOS_RAPIDOS.md → Comandos úteis
+
+

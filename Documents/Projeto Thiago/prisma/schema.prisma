@@ -1,0 +1,514 @@
+// Prosperty Brazil - Database Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTHENTICATION & USERS
+// ============================================
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String?
+  lastName     String?
+  phone        String?
+  role         UserRole @default(USER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  agentProfile         AgentProfile?
+  caixaProfile         CaixaProfile?
+  auctionBids          Bid[]
+  auctionRegistrations AuctionRegistration[]
+  leads                Lead[]
+  assignedLeads        Lead[]                @relation("AssignedAgent")
+  auditLogs            AuditLog[]
+  subscriptions        Subscription[]
+
+  @@index([email])
+  @@index([role])
+}
+
+enum UserRole {
+  USER
+  AGENT
+  CAIXA_ADMIN
+  CAIXA_OPERATOR
+  AUCTION_VENDOR
+  SUPER_ADMIN
+}
+
+// ============================================
+// PROSPERTYCORE - ASSET MANAGEMENT
+// ============================================
+
+model Asset {
+  id          String      @id @default(uuid())
+  assetCode   String      @unique // CAIXA internal code
+  assetType   AssetType
+  status      AssetStatus @default(PRE_AUCTION)
+  title       String
+  description String?
+
+  // Location
+  address      String
+  city         String
+  state        String
+  zipCode      String?
+  neighborhood String?
+  latitude     Float?
+  longitude    Float?
+
+  // Property Details
+  propertyType     PropertyType
+  bedrooms         Int?
+  bathrooms        Int?
+  area             Float // m²
+  lotArea          Float? // m²
+  constructionYear Int?
+
+  // Financial
+  estimatedValue Float? // AVM estimate
+  askingPrice    Float?
+  reservePrice   Float? // For auctions
+  finalSalePrice Float?
+
+  // Legal
+  legalStatus      LegalStatus
+  hasTitleIssues   Boolean     @default(false)
+  hasOccupancy     Boolean     @default(false)
+  foreclosureStage String?
+
+  // Metadata
+  tags      String[]
+  metadata  Json? // Flexible JSON for additional fields
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  soldAt    DateTime?
+
+  // Relations
+  documents   Document[]
+  media       Media[]
+  auctions    Auction[]
+  leads       Lead[]
+  valuations  Valuation[]
+  areaReports AreaReport[]
+  auditLogs   AuditLog[]
+
+  @@index([status])
+  @@index([assetType])
+  @@index([city, state])
+  @@index([legalStatus])
+}
+
+enum AssetType {
+  REO
+  JUDICIAL_AUCTION
+  SOCIAL_HOUSING
+  REPOSSESSED_DEVELOPER
+  DISTRESSED
+}
+
+enum AssetStatus {
+  PRE_AUCTION
+  ACTIVE_SALE
+  AUCTION_SCHEDULED
+  AUCTION_ACTIVE
+  SOLD
+  WRITTEN_OFF
+  ON_HOLD
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  COMMERCIAL
+  LAND
+  MIXED_USE
+}
+
+enum LegalStatus {
+  FORECLOSURE_PENDING
+  REPOSSESSED
+  JUDICIAL_PROCESS
+  CLEAR_TITLE
+  TITLE_DISPUTE
+}
+
+// ============================================
+// DOCUMENTS & MEDIA
+// ============================================
+
+model Document {
+  id           String       @id @default(uuid())
+  assetId      String
+  asset        Asset        @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  fileName     String
+  fileType     String
+  fileUrl      String
+  documentType DocumentType
+  uploadedAt   DateTime     @default(now())
+
+  @@index([assetId])
+}
+
+enum DocumentType {
+  TITLE_DEED
+  APPRAISAL
+  LEGAL_DOCUMENT
+  AUCTION_NOTICE
+  INSPECTION_REPORT
+  OTHER
+}
+
+model Media {
+  id         String    @id @default(uuid())
+  assetId    String
+  asset      Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  fileUrl    String
+  mediaType  MediaType
+  isPrimary  Boolean   @default(false)
+  uploadedAt DateTime  @default(now())
+
+  @@index([assetId])
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  VIRTUAL_TOUR
+}
+
+// ============================================
+// AUCTION MANAGEMENT
+// ============================================
+
+model Auction {
+  id          String        @id @default(uuid())
+  assetId     String
+  asset       Asset         @relation(fields: [assetId], references: [id])
+  auctionCode String        @unique
+  auctionType AuctionType
+  status      AuctionStatus @default(SCHEDULED)
+
+  // Timing
+  scheduledStart DateTime
+  scheduledEnd   DateTime?
+  actualStart    DateTime?
+  actualEnd      DateTime?
+
+  // Rules
+  startingBid  Float
+  reservePrice Float?
+  bidIncrement Float
+  auctionRules Json? // Flexible rules configuration
+
+  // Vendor
+  vendorId   String?
+  vendorName String?
+
+  // Results
+  winningBidId String?
+  totalBids    Int     @default(0)
+  participants Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  bids          Bid[]
+  registrations AuctionRegistration[]
+
+  @@index([status])
+  @@index([assetId])
+  @@index([scheduledStart])
+}
+
+enum AuctionType {
+  ENGLISH
+  DUTCH
+  SEALED_BID
+  HYBRID
+}
+
+enum AuctionStatus {
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+model AuctionRegistration {
+  id           String    @id @default(uuid())
+  auctionId    String
+  auction      Auction   @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User      @relation(fields: [userId], references: [id])
+  kycStatus    KYCStatus @default(PENDING)
+  kycData      Json?
+  registeredAt DateTime  @default(now())
+
+  @@unique([auctionId, userId])
+  @@index([auctionId])
+  @@index([userId])
+}
+
+enum KYCStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Bid {
+  id        String   @id @default(uuid())
+  auctionId String
+  auction   Auction  @relation(fields: [auctionId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  amount    Float
+  isWinning Boolean  @default(false)
+  placedAt  DateTime @default(now())
+
+  @@index([auctionId])
+  @@index([userId])
+  @@index([placedAt])
+}
+
+// ============================================
+// CRM & LEAD MANAGEMENT
+// ============================================
+
+model Lead {
+  id      String     @id @default(uuid())
+  assetId String?
+  asset   Asset?     @relation(fields: [assetId], references: [id])
+  source  LeadSource
+  status  LeadStatus @default(NEW)
+
+  // Contact Info
+  name  String
+  email String
+  phone String?
+
+  // Assignment
+  assignedToId String?
+  assignedTo   User?   @relation("AssignedAgent", fields: [assignedToId], references: [id])
+  createdById  String?
+  createdBy    User?   @relation(fields: [createdById], references: [id])
+
+  // Details
+  message  String?
+  intent   LeadIntent?
+  priority LeadPriority @default(MEDIUM)
+
+  // Tracking
+  firstContactAt DateTime?
+  lastContactAt  DateTime?
+  convertedAt    DateTime?
+  notes          Json? // Array of notes/activities
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([assetId])
+  @@index([source])
+}
+
+enum LeadSource {
+  PORTAL_INQUIRY
+  PHONE_CALL
+  EMAIL
+  AUCTION_REGISTRATION
+  AGENT_REFERRAL
+  MARKETPLACE_SYNDICATION
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  VIEWING_SCHEDULED
+  OFFER_SUBMITTED
+  NEGOTIATING
+  CONVERTED
+  LOST
+  INACTIVE
+}
+
+enum LeadIntent {
+  BUY
+  INVEST
+  RENT
+  AUCTION_PARTICIPATION
+  INFORMATION
+}
+
+enum LeadPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model AgentProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Agent Details
+  creciNumber    String   @unique // Brazilian real estate license
+  agencyName     String?
+  specialization String[]
+  regions        String[] // Cities/states they operate in
+
+  // Performance
+  totalLeads     Int    @default(0)
+  convertedLeads Int    @default(0)
+  totalSales     Int    @default(0)
+  totalVolume    Float  @default(0)
+  rating         Float? @default(0)
+
+  // Status
+  isCertified Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  certifiedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([creciNumber])
+  @@index([isActive])
+}
+
+model CaixaProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department  String?
+  region      String?
+  permissions Json? // Role-based permissions
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================
+// DATA & INTELLIGENCE TOOLS
+// ============================================
+
+model Valuation {
+  id             String        @id @default(uuid())
+  assetId        String
+  asset          Asset         @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  valuationType  ValuationType
+  estimatedValue Float
+  confidence     Float // 0-1 score
+  methodology    String?
+  comparables    Json? // Array of comparable properties
+  reportData     Json? // Full AVM report data
+  generatedAt    DateTime      @default(now())
+
+  @@index([assetId])
+  @@index([generatedAt])
+}
+
+enum ValuationType {
+  AVM_SALE
+  AVM_RENT
+  MANUAL_APPRAISAL
+  MARKET_COMPARISON
+}
+
+model AreaReport {
+  id                  String   @id @default(uuid())
+  assetId             String
+  asset               Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  areaType            AreaType
+  areaName            String // Neighborhood, city, etc.
+  score               Float // 0-100 marketability score
+  demandScore         Float?
+  supplyScore         Float?
+  infrastructureScore Float?
+  priceTrend          Json? // Historical price data
+  marketData          Json? // Comprehensive market intelligence
+  generatedAt         DateTime @default(now())
+
+  @@index([assetId])
+  @@index([areaName])
+}
+
+enum AreaType {
+  NEIGHBORHOOD
+  MUNICIPALITY
+  REGION
+  STATE
+}
+
+// ============================================
+// SUBSCRIPTIONS & MONETIZATION
+// ============================================
+
+model Subscription {
+  id          String             @id @default(uuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planType    SubscriptionPlan
+  status      SubscriptionStatus @default(ACTIVE)
+  credits     Int                @default(0)
+  creditsUsed Int                @default(0)
+  startedAt   DateTime           @default(now())
+  expiresAt   DateTime?
+  cancelledAt DateTime?
+
+  @@index([userId])
+  @@index([status])
+}
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  PRO
+  INVESTOR_PLUS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  SUSPENDED
+}
+
+// ============================================
+// AUDIT & COMPLIANCE
+// ============================================
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  assetId    String?
+  asset      Asset?   @relation(fields: [assetId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  changes    Json? // Before/after state
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([assetId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
