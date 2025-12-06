@@ -1,0 +1,21 @@
+# Nixpacks configuration for Railway
+# This ensures Railway recognizes this as a Node.js project
+
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+cmds = [
+  "npm ci",
+  "npx prisma generate"
+]
+
+[phases.build]
+cmds = [
+  "npm run build",
+  "npx prisma migrate deploy"
+]
+
+[start]
+cmd = "npm start"
+
