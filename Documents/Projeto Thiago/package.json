@@ -7,8 +7,9 @@
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:server": "nodemon --exec ts-node src/server.ts",
     "dev:client": "cd client && npm run dev",
-    "build": "tsc && cd client && npm run build",
+    "build": "tsc",
     "start": "node dist/server.js",
+    "postinstall": "npx prisma generate",
     "test": "jest",
     "lint": "eslint src --ext .ts"
   },
