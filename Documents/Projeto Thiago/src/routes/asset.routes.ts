@@ -33,3 +33,5 @@ router.post('/:id/media', authorize('CAIXA_ADMIN', 'CAIXA_OPERATOR', 'SUPER_ADMI
 export default router;
 
 
+
+

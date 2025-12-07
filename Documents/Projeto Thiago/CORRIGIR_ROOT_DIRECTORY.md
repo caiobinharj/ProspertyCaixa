@@ -96,3 +96,5 @@ Se quiser evitar isso no futuro, você pode reorganizar o repositório para que 
 
 **A solução é simples: Root Directory = `Documents/Projeto Thiago`**
 
+
+

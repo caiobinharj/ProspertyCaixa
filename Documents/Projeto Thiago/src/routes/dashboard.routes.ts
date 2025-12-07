@@ -21,3 +21,5 @@ router.get('/agents', authorize('CAIXA_ADMIN', 'CAIXA_OPERATOR', 'SUPER_ADMIN'),
 export default router;
 
 
+
+

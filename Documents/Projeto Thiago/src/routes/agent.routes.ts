@@ -21,3 +21,5 @@ router.post('/:id/certify', authorize('CAIXA_ADMIN', 'SUPER_ADMIN'), certifyAgen
 export default router;
 
 
+
+

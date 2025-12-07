@@ -76,3 +76,5 @@ O `--include=dev` garante que as dependências de desenvolvimento (incluindo @ty
 
 **A solução é adicionar `--include=dev` no Build Command!**
 
+
+

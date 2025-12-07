@@ -230,3 +230,5 @@ Depois de configurar as variáveis:
 4. ✅ Configure o frontend no Vercel
 5. ✅ Atualize `CORS_ORIGIN` com a URL do Vercel
 
+
+

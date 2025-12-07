@@ -134,3 +134,5 @@ Se ainda der erro após configurar corretamente:
 2. Confirme que as variáveis aparecem na lista
 3. Tente **deletar e recriar** o serviço (último recurso)
 
+
+

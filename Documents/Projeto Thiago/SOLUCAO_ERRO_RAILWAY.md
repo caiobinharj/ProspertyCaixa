@@ -94,3 +94,5 @@ Settings → Build:
 2. **Confirme que todas as variáveis estão salvas**
 3. **Tente deletar e recriar o serviço** (último recurso)
 
+
+

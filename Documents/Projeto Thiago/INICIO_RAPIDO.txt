@@ -69,3 +69,5 @@ Este projeto precisa de:
 - COMANDOS_RAPIDOS.md → Comandos úteis
 
 
+
+

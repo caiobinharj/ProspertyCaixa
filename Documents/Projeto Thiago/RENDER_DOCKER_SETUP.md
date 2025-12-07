@@ -86,3 +86,5 @@ Após o deploy:
 
 O Dockerfile já está configurado e pronto. Basta fazer redeploy no Render após o push!
 
+
+

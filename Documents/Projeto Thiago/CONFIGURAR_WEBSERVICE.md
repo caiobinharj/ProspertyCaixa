@@ -238,3 +238,5 @@ Se algo der errado:
 2. **Verifique cada variável** individualmente
 3. **Teste o build localmente** primeiro: `npm run build`
 
+
+

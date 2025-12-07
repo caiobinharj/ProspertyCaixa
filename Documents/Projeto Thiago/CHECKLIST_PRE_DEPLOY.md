@@ -222,3 +222,5 @@ git push
 - Criar migrações localmente
 - Verificar logs após deploy
 
+
+

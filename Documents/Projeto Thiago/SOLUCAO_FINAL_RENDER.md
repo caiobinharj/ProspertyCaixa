@@ -87,3 +87,5 @@ CORS_ORIGIN = *
 
 **A mudança é simples: use `npm install` ao invés de `npm ci` no Build Command!**
 
+
+

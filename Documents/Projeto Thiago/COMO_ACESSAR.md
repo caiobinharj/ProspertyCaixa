@@ -195,3 +195,5 @@ CORS_ORIGIN=https://prosperty-caixa.vercel.app
 2. **Depois**: Faça deploy no Railway + Vercel
 3. **Compartilhe**: A URL do Vercel com quem quiser acessar!
 
+
+

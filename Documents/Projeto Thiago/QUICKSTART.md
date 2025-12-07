@@ -255,3 +255,5 @@ O frontend está em `client/` e inclui:
 Para dúvidas ou problemas, consulte a documentação completa no `README.md`.
 
 
+
+

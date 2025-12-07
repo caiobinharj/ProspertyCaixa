@@ -60,3 +60,5 @@
 
 📚 Veja RAILWAY_VARIABLES.md para detalhes completos!
 
+
+

@@ -117,3 +117,5 @@ Depois que o backend estiver no ar:
 - [ ] Health check funcionando
 - [ ] Frontend configurado no Vercel
 
+
+

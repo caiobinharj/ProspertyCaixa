@@ -180,3 +180,5 @@ Se nada funcionar, pode ser um bug do Railway. Nesse caso:
 
 Se o problema persistir, podemos modificar o código para não exigir a variável durante o build. Mas isso não é ideal para produção.
 
+
+
